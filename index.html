@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>在线投票系统</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: '微软雅黑', sans-serif;
+        }
+
+        body {
+            background-color: #f0f2f5;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            color: #1a73e8;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .option {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+        }
+
+        .option:hover {
+            transform: translateX(10px);
+            border-color: #1a73e8;
+        }
+
+        input[type="radio"] {
+            margin-right: 15px;
+            width: 20px;
+            height: 20px;
+        }
+
+        label {
+            flex-grow: 1;
+            font-size: 16px;
+        }
+
+        button {
+            background: #1a73e8;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 20px;
+            width: 100%;
+            transition: background 0.3s ease;
+        }
+
+        button:hover {
+            background: #1557b0;
+        }
+
+        .results {
+            margin-top: 30px;
+            display: none;
+        }
+
+        .result-item {
+            margin: 10px 0;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 5px;
+        }
+
+        .bar {
+            height: 20px;
+            background: #1a73e8;
+            margin-top: 5px;
+            border-radius: 3px;
+            transition: width 0.5s ease;
+        }
+
+        .total-votes {
+            text-align: center;
+            color: #666;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>您最喜欢的编程语言是？</h1>
+        
+        <div class="options">
+            <div class="option">
+                <input type="radio" name="vote" id="python" value="Python">
+                <label for="python">Python</label>
+                <span class="count">0 票</span>
+            </div>
+            <div class="option">
+                <input type="radio" name="vote" id="javascript" value="JavaScript">
+                <label for="javascript">JavaScript</label>
+                <span class="count">0 票</span>
+            </div>
+            <div class="option">
+                <input type="radio" name="vote" id="java" value="Java">
+                <label for="java">Java</label>
+                <span class="count">0 票</span>
+            </div>
+            <div class="option">
+                <input type="radio" name="vote" id="csharp" value="C#">
+                <label for="csharp">C#</label>
+                <span class="count">0 票</span>
+            </div>
+        </div>
+
+        <button onclick="submitVote()">提交投票</button>
+
+        <div class="results">
+            <h2>当前投票结果</h2>
+            <div id="result-container"></div>
+            <div class="total-votes" id="total-votes">总票数：0</div>
+        </div>
+    </div>
+
+    <script>
+        let votes = {
+            Python: 0,
+            JavaScript: 0,
+            Java: 0,
+            'C#': 0
+        };
+
+        function submitVote() {
+            const selected = document.querySelector('input[name="vote"]:checked');
+            if (!selected) {
+                alert('请先选择一个选项！');
+                return;
+            }
+
+            votes[selected.value]++;
+            updateResults();
+            showResults();
+            selected.checked = false;
+        }
+
+        function updateResults() {
+            // 更新选项旁边的票数显示
+            document.querySelectorAll('.option').forEach(option => {
+                const label = option.querySelector('label').textContent;
+                option.querySelector('.count').textContent = `${votes[label]} 票`;
+            });
+
+            // 更新结果图表
+            const resultContainer = document.getElementById('result-container');
+            resultContainer.innerHTML = '';
+            
+            Object.entries(votes).forEach(([language, count]) => {
+                const total = Object.values(votes).reduce((a, b) => a + b, 0);
+                const percentage = total === 0 ? 0 : (count / total * 100).toFixed(1);
+                
+                const div = document.createElement('div');
+                div.className = 'result-item';
+                div.innerHTML = `
+                    <div>${language}</div>
+                    <div>${count} 票 (${percentage}%)</div>
+                    <div class="bar" style="width: ${percentage}%"></div>
+                `;
+                resultContainer.appendChild(div);
+            });
+
+            document.getElementById('total-votes').textContent = `总票数：${Object.values(votes).reduce((a, b) => a + b, 0)}`;
+        }
+
+        function showResults() {
+            document.querySelector('.results').style.display = 'block';
+        }
+
+        // 初始化显示结果
+        updateResults();
+    </script>
+</body>
+</html>
